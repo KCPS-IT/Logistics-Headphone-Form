@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Headphone Acknowledgment Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .acknowledgment-text {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #495057;
+            text-align: center;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .signature-section {
+            margin-top: 40px;
+        }
+
+        .signature-pad-container {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: white;
+        }
+
+        #signature-pad {
+            width: 100%;
+            height: 200px;
+            border: none;
+            border-radius: 8px;
+            cursor: crosshair;
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .signature-instructions {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .signature-instructions p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .signature-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .google-form-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .google-form-section h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .form-info {
+            margin-top: 15px;
+        }
+
+        .form-info p {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .form-content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .signature-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Headphone Acknowledgment Form</h1>
+            <p>Academic Year 2025/2026</p>
+        </div>
+        
+        <div class="form-content">
+            <form id="acknowledgmentForm">
+                <div class="form-group">
+                    <div class="acknowledgment-text">
+                        I acknowledge that I received testing headphones for SY25/26 on
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userName">Full Name:</label>
+                    <input type="text" id="userName" name="userName" class="date-input" 
+                           placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="receiptDate">Date of Receipt:</label>
+                    <input type="date" id="receiptDate" name="receiptDate" class="date-input" required>
+                </div>
+                
+                <div class="form-group signature-section">
+                    <label for="signature-pad">Digital Signature:</label>
+                    <div class="signature-pad-container">
+                        <canvas id="signature-pad"></canvas>
+                        <div class="signature-instructions">
+                            <p>📱 Use your finger on touch devices or mouse cursor on desktop</p>
+                        </div>
+                    </div>
+                    <div class="signature-controls">
+                        <button type="button" class="btn btn-secondary" id="clearSignature">Clear Signature</button>
+                        <button type="button" class="btn btn-secondary" id="undoSignature">Undo</button>
+                        <button type="button" class="btn btn-secondary" id="testSignature">Test Draw</button>
+                    </div>
+                </div>
+                
+                <div class="google-form-section">
+                    <h3>Form Submission</h3>
+                    <p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 20px;">
+                        This form will automatically submit data to your Google Form and populate your Google Sheet.
+                    </p>
+                    <div class="form-info">
+                        <p><strong>Status:</strong> <span style="color: #28a745;">✓ Google Form Connected</span></p>
+                        <p><strong>Form URL:</strong> <a href="https://docs.google.com/forms/d/1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw/viewform" target="_blank" style="color: #667eea;">View Google Form</a></p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button type="submit" class="btn btn-success" id="submitForm">
+                        Submit to Google Form
+                    </button>
+                </div>
+            </form>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your form...</p>
+            </div>
+            
+            <div id="statusMessage"></div>
+        </div>
+    </div>
+
+
+
+    <script>
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let isFormValid = false;
+        let signatureData = [];
+        let googleFormUrl = 'https://docs.google.com/forms/d/1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw/formResponse';
+        let googleFormId = '1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw';
+        let entryIdName = 'entry.1859547506';
+        let entryIdDate = 'entry.687660393';
+        let entryIdSignature = 'entry.1682439405';
+        let entryIdTimestamp = 'entry.1625666380';
+
+        // Initialize signature pad
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('signature-pad');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            function resizeCanvas() {
+                const container = canvas.parentElement;
+                const rect = container.getBoundingClientRect();
+                
+                // Set CSS size
+                canvas.style.width = (rect.width - 4) + 'px';
+                canvas.style.height = '200px';
+                
+                // Set actual canvas size
+                canvas.width = rect.width - 4;
+                canvas.height = 200;
+                
+                // Clear and redraw signature if exists
+                if (signatureData.length > 0) {
+                    redrawSignature();
+                }
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Set up canvas drawing
+            ctx.strokeStyle = '#000000'; // Black color
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+            
+            function startDrawing(e) {
+                isDrawing = true;
+                const pos = getPosition(e);
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                const pos = getPosition(e);
+                const currentX = pos.x;
+                const currentY = pos.y;
+                
+                // Draw line
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(currentX, currentY);
+                ctx.stroke();
+                
+                // Store signature data
+                signatureData.push({
+                    x1: lastX,
+                    y1: lastY,
+                    x2: currentX,
+                    y2: currentY
+                });
+                
+                lastX = currentX;
+                lastY = currentY;
+                
+                validateForm();
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+            }
+            
+            function getPosition(e) {
+                let x, y;
+                
+                if (e.type.includes('touch')) {
+                    const touch = e.touches[0] || e.changedTouches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    x = touch.clientX - rect.left;
+                    y = touch.clientY - rect.top;
+                } else {
+                    const rect = canvas.getBoundingClientRect();
+                    x = e.clientX - rect.left;
+                    y = e.clientY - rect.top;
+                }
+                
+                return { x, y };
+            }
+            
+            function handleTouch(e) {
+                e.preventDefault();
+                
+                if (e.type === 'touchstart') {
+                    startDrawing(e);
+                } else if (e.type === 'touchmove') {
+                    draw(e);
+                }
+            }
+            
+            function redrawSignature() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                signatureData.forEach(line => {
+                    ctx.beginPath();
+                    ctx.moveTo(line.x1, line.y1);
+                    ctx.lineTo(line.x2, line.y2);
+                    ctx.stroke();
+                });
+            }
+            
+            // Clear signature
+            document.getElementById('clearSignature').addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                signatureData = [];
+                validateForm();
+            });
+            
+            // Undo last stroke
+            document.getElementById('undoSignature').addEventListener('click', function() {
+                if (signatureData.length > 0) {
+                    signatureData.pop();
+                    redrawSignature();
+                    validateForm();
+                }
+            });
+            
+            // Test signature functionality
+            document.getElementById('testSignature').addEventListener('click', function() {
+                console.log('Test button clicked');
+                console.log('Canvas:', canvas);
+                console.log('Canvas context:', ctx);
+                console.log('Signature data:', signatureData);
+                
+                // Draw a test line
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(10, 10);
+                ctx.lineTo(100, 100);
+                ctx.stroke();
+                console.log('Test line drawn');
+                
+                // Reset to black
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+            });
+            
+            // Test Google Form submission
+            document.getElementById('testSignature').addEventListener('dblclick', function() {
+                console.log('Double-clicked test button - testing Google Form submission');
+                console.log('Form URL:', googleFormUrl);
+                console.log('Entry IDs:', {
+                    name: entryIdName,
+                    date: entryIdDate,
+                    signature: entryIdSignature,
+                    timestamp: entryIdTimestamp
+                });
+                
+                // Test the submission function
+                submitToGoogleForm().then(result => {
+                    console.log('Test submission result:', result);
+                });
+            });
+            
+            // Form validation
+            document.getElementById('receiptDate').addEventListener('change', validateForm);
+            
+            // Form submission
+            document.getElementById('acknowledgmentForm').addEventListener('submit', handleFormSubmission);
+            
+
+        });
+
+        function validateForm() {
+            const name = document.getElementById('userName').value.trim();
+            const date = document.getElementById('receiptDate').value;
+            const hasSignature = signatureData.length > 0;
+            
+            isFormValid = name && date && hasSignature;
+            
+            const submitBtn = document.getElementById('submitForm');
+            submitBtn.disabled = !isFormValid;
+            
+            return isFormValid;
+        }
+
+        function showStatus(message, isSuccess = true) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-message ${isSuccess ? 'status-success' : 'status-error'}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const submitBtn = document.getElementById('submitForm');
+            
+            if (show) {
+                loading.style.display = 'block';
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Processing...';
+            } else {
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Generate & Send Form';
+            }
+        }
+
+        async function handleFormSubmission(e) {
+            e.preventDefault();
+            
+            if (!isFormValid) {
+                showStatus('Please fill in all required fields and provide a signature.', false);
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Submit to Google Form
+                const success = await submitToGoogleForm();
+                
+                if (success) {
+                    showStatus('Form submitted successfully! Data has been sent to Google Forms and will appear in your Google Sheet.');
+                    
+                    // Generate and download PDF
+                    try {
+                        await generateAndDownloadPDF();
+                        showStatus('Form submitted successfully! PDF has been generated and downloaded to your device.');
+                    } catch (pdfError) {
+                        console.error('PDF generation failed:', pdfError);
+                        showStatus('Form submitted successfully! PDF generation failed, but data was sent to Google Forms.');
+                    }
+                    
+                    // Reset form
+                    document.getElementById('acknowledgmentForm').reset();
+                    const canvas = document.getElementById('signature-pad');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    signatureData = [];
+                    validateForm();
+                } else {
+                    showStatus('Failed to submit form. Please check your Google Form configuration.', false);
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('An error occurred while submitting the form. Please try again.', false);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function generatePDF() {
+            return new Promise((resolve) => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add header
+                doc.setFontSize(20);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Headphone Acknowledgment Form', 105, 20, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Valencia College - Academic Year 2025/2026', 105, 30, { align: 'center' });
+                
+                // Add acknowledgment text
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text('I acknowledge that I received testing headphones for SY25/26 on:', 20, 50);
+                
+                // Add date
+                const date = document.getElementById('receiptDate').value;
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                doc.text(formattedDate, 20, 65);
+                
+                // Add signature
+                if (signatureData.length > 0) {
+                    // Convert canvas to data URL for PDF
+                    const canvas = document.getElementById('signature-pad');
+                    const signatureImage = canvas.toDataURL('image/png');
+                    doc.addImage(signatureImage, 'PNG', 20, 80, 60, 30);
+                    doc.text('Digital Signature:', 20, 75);
+                }
+                
+                // Add timestamp
+                const timestamp = new Date().toLocaleString();
+                doc.setFontSize(10);
+                doc.text(`Form generated on: ${timestamp}`, 20, 140);
+                
+                resolve(doc);
+            });
+        }
+
+
+
+        async function submitToGoogleForm() {
+            if (!googleFormUrl) {
+                showStatus('Please configure Google Form URL first.', false);
+                return false;
+            }
+
+            try {
+                // Convert signature to text representation
+                const canvas = document.getElementById('signature-pad');
+                const hasSignature = signatureData.length > 0;
+                const signatureText = hasSignature ? 'SIGNED' : 'NOT SIGNED';
+                
+                // Get form values
+                const name = document.getElementById('userName').value.trim();
+                const date = document.getElementById('receiptDate').value;
+                const now = new Date();
+                const timestamp = now.toLocaleDateString('en-US') + ' ' + now.toLocaleTimeString('en-US');
+
+                // Log what we're sending for debugging
+                console.log('Submitting form data:', {
+                    name: name,
+                    date: date,
+                    signature: signatureText,
+                    timestamp: timestamp
+                });
+
+                // Create URL-encoded form data (Google Forms expects this format)
+                const formData = new URLSearchParams();
+                formData.append(entryIdName, name);
+                formData.append(entryIdDate, date);
+                formData.append(entryIdSignature, signatureText);
+                formData.append(entryIdTimestamp, timestamp);
+
+                console.log('Form data string:', formData.toString());
+
+                // Try multiple submission methods
+                let submissionSuccess = false;
+
+                // Method 1: Fetch API
+                try {
+                    const response = await fetch(googleFormUrl, {
+                        method: 'POST',
+                        body: formData.toString(),
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        }
+                    });
+
+                    console.log('Fetch response received:', response);
+                    
+                    if (response.type === 'opaque') {
+                        console.log('Form submitted successfully via fetch (opaque response)');
+                        submissionSuccess = true;
+                    }
+                } catch (fetchError) {
+                    console.log('Fetch method failed:', fetchError);
+                }
+
+                // Method 2: Hidden iframe (Google Forms often works better with this)
+                if (!submissionSuccess) {
+                    try {
+                        const iframe = document.createElement('iframe');
+                        iframe.style.display = 'none';
+                        iframe.name = 'hidden-iframe';
+                        document.body.appendChild(iframe);
+
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = googleFormUrl;
+                        form.target = 'hidden-iframe';
+
+                        // Add form fields
+                        Object.entries({
+                            [entryIdName]: name,
+                            [entryIdDate]: date,
+                            [entryIdSignature]: signatureText,
+                            [entryIdTimestamp]: timestamp
+                        }).forEach(([key, value]) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = value;
+                            form.appendChild(input);
+                        });
+
+                        document.body.appendChild(form);
+                        form.submit();
+
+                        // Clean up
+                        setTimeout(() => {
+                            document.body.removeChild(form);
+                            document.body.removeChild(iframe);
+                        }, 1000);
+
+                        console.log('Form submitted via iframe method');
+                        submissionSuccess = true;
+                    } catch (iframeError) {
+                        console.log('Iframe method failed:', iframeError);
+                    }
+                }
+
+                return submissionSuccess;
+            } catch (error) {
+                console.error('Error submitting to Google Form:', error);
+                return false;
+            }
+        }
+
+        async function generateAndDownloadPDF() {
+            try {
+                // Get form data
+                const name = document.getElementById('userName').value.trim();
+                const date = document.getElementById('receiptDate').value;
+                const signatureCanvas = document.getElementById('signature-pad');
+                
+                // Format date for display
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // Generate PDF using jsPDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add header
+                doc.setFontSize(24);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Headphone Acknowledgment Form', 105, 20, { align: 'center' });
+                
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Academic Year 2025/2026', 105, 30, { align: 'center' });
+                
+                // Add form content
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'normal');
+                
+                // Name
+                doc.setFont('helvetica', 'bold');
+                doc.text('Full Name:', 20, 50);
+                doc.setFont('helvetica', 'normal');
+                doc.text(name, 20, 60);
+                
+                // Date
+                doc.setFont('helvetica', 'bold');
+                doc.text('Date of Receipt:', 20, 80);
+                doc.setFont('helvetica', 'normal');
+                doc.text(formattedDate, 20, 90);
+                
+                // Acknowledgment text
+                doc.setFont('helvetica', 'bold');
+                doc.text('Acknowledgment:', 20, 110);
+                doc.setFont('helvetica', 'normal');
+                doc.text('I acknowledge that I received testing headphones for SY25/26 on ' + formattedDate, 20, 120);
+                
+                // Signature
+                if (signatureData.length > 0) {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Digital Signature:', 20, 150);
+                    
+                    // Convert signature to image and add to PDF
+                    const signatureImage = signatureCanvas.toDataURL('image/png');
+                    doc.addImage(signatureImage, 'PNG', 20, 160, 60, 30);
+                    
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('Signature captured electronically', 20, 200);
+                }
+                
+                // Timestamp
+                const timestamp = new Date().toLocaleString('en-US');
+                doc.setFont('helvetica', 'bold');
+                doc.text('Form Generated On:', 20, 220);
+                doc.setFont('helvetica', 'normal');
+                doc.text(timestamp, 20, 230);
+                
+                // Footer
+                doc.setFontSize(10);
+                doc.text('This form was electronically generated and submitted to Google Forms.', 105, 250, { align: 'center' });
+                
+                // Generate filename
+                const filename = `Headphone_Acknowledgment_${name.replace(/\s+/g, '_')}_${date}.pdf`;
+                
+                // Download PDF (iOS compatible)
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    // For older browsers
+                    const blob = doc.output('blob');
+                    window.navigator.msSaveOrOpenBlob(blob, filename);
+                } else {
+                    // Modern browsers and iOS
+                    const pdfDataUri = doc.output('datauristring');
+                    
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = pdfDataUri;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    
+                    // For iOS, we need to open in new window
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                        // iOS device - open PDF in new window for user to save
+                        const newWindow = window.open();
+                        newWindow.document.write(`
+                            <html>
+                                <head>
+                                    <title>Download PDF</title>
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <style>
+                                        body { 
+                                            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+                                            margin: 20px; 
+                                            text-align: center; 
+                                        }
+                                        .download-btn { 
+                                            background: #007AFF; 
+                                            color: white; 
+                                            padding: 15px 30px; 
+                                            border-radius: 10px; 
+                                            text-decoration: none; 
+                                            display: inline-block; 
+                                            margin: 20px; 
+                                            font-size: 18px; 
+                                        }
+                                        .pdf-embed { 
+                                            width: 100%; 
+                                            height: 80vh; 
+                                            border: none; 
+                                            margin: 20px 0; 
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    <h2>Headphone Acknowledgment Form</h2>
+                                    <p>Your form has been generated successfully!</p>
+                                    <a href="${pdfDataUri}" download="${filename}" class="download-btn">
+                                        📥 Download PDF
+                                    </a>
+                                    <p>Or view the PDF below:</p>
+                                    <embed src="${pdfDataUri}" type="application/pdf" class="pdf-embed">
+                                </body>
+                            </html>
+                        `);
+                    } else {
+                        // Non-iOS devices - trigger download directly
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }
+                
+                console.log('PDF generated and download initiated:', filename);
+                return true;
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                throw error;
+            }
+        }
+    </script>
+</body>
+</html>
