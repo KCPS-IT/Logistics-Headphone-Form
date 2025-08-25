@@ -275,7 +275,7 @@
             <form id="acknowledgmentForm">
                 <div class="form-group">
                     <div class="acknowledgment-text">
-                        I acknowledge that I received testing headphones for SY25/26 on
+                        I acknowledge that I received testing headphones for SY25/26
                     </div>
                 </div>
                 
@@ -283,6 +283,12 @@
                     <label for="userName">Full Name:</label>
                     <input type="text" id="userName" name="userName" class="date-input" 
                            placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="schoolName">Name of School:</label>
+                    <input type="text" id="schoolName" name="schoolName" class="date-input" 
+                           placeholder="Enter your school name" required>
                 </div>
                 
                 <div class="form-group">
@@ -342,6 +348,7 @@
         let googleFormUrl = 'https://docs.google.com/forms/d/1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw/formResponse';
         let googleFormId = '1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw';
         let entryIdName = 'entry.1859547506';
+        let entryIdSchool = 'entry.1171883598';
         let entryIdDate = 'entry.687660393';
         let entryIdSignature = 'entry.1682439405';
         let entryIdTimestamp = 'entry.1625666380';
@@ -499,10 +506,11 @@
 
         function validateForm() {
             const name = document.getElementById('userName').value.trim();
+            const school = document.getElementById('schoolName').value.trim();
             const date = document.getElementById('receiptDate').value;
             const hasSignature = signatureData.length > 0;
             
-            isFormValid = name && date && hasSignature;
+            isFormValid = name && school && date && hasSignature;
             
             const submitBtn = document.getElementById('submitForm');
             submitBtn.disabled = !isFormValid;
@@ -642,6 +650,7 @@
                 
                 // Get form values
                 const name = document.getElementById('userName').value.trim();
+                const school = document.getElementById('schoolName').value.trim();
                 const date = document.getElementById('receiptDate').value;
                 const now = new Date();
                 const timestamp = now.toLocaleDateString('en-US') + ' ' + now.toLocaleTimeString('en-US');
@@ -649,6 +658,7 @@
                 // Log what we're sending for debugging
                 console.log('Submitting form data:', {
                     name: name,
+                    school: school,
                     date: date,
                     signature: signatureText,
                     timestamp: timestamp
@@ -657,6 +667,7 @@
                 // Create URL-encoded form data (Google Forms expects this format)
                 const formData = new URLSearchParams();
                 formData.append(entryIdName, name);
+                formData.append(entryIdSchool, school);
                 formData.append(entryIdDate, date);
                 formData.append(entryIdSignature, signatureText);
                 formData.append(entryIdTimestamp, timestamp);
@@ -703,6 +714,7 @@
                         // Add form fields
                         Object.entries({
                             [entryIdName]: name,
+                            [entryIdSchool]: school,
                             [entryIdDate]: date,
                             [entryIdSignature]: signatureText,
                             [entryIdTimestamp]: timestamp
@@ -741,6 +753,7 @@
             try {
                 // Get form data
                 const name = document.getElementById('userName').value.trim();
+                const school = document.getElementById('schoolName').value.trim();
                 const date = document.getElementById('receiptDate').value;
                 const signatureCanvas = document.getElementById('signature-pad');
                 
@@ -774,41 +787,47 @@
                 doc.setFont('helvetica', 'normal');
                 doc.text(name, 20, 60);
                 
+                // School
+                doc.setFont('helvetica', 'bold');
+                doc.text('Name of School:', 20, 75);
+                doc.setFont('helvetica', 'normal');
+                doc.text(school, 20, 85);
+                
                 // Date
                 doc.setFont('helvetica', 'bold');
-                doc.text('Date of Receipt:', 20, 80);
+                doc.text('Date of Receipt:', 20, 100);
                 doc.setFont('helvetica', 'normal');
-                doc.text(formattedDate, 20, 90);
+                doc.text(formattedDate, 20, 110);
                 
                 // Acknowledgment text
                 doc.setFont('helvetica', 'bold');
-                doc.text('Acknowledgment:', 20, 110);
+                doc.text('Acknowledgment:', 20, 130);
                 doc.setFont('helvetica', 'normal');
-                doc.text('I acknowledge that I received testing headphones for SY25/26 on ' + formattedDate, 20, 120);
+                doc.text('I acknowledge that I received testing headphones for SY25/26 on ' + formattedDate, 20, 140);
                 
                 // Signature
                 if (signatureData.length > 0) {
                     doc.setFont('helvetica', 'bold');
-                    doc.text('Digital Signature:', 20, 150);
+                    doc.text('Digital Signature:', 20, 170);
                     
                     // Convert signature to image and add to PDF
                     const signatureImage = signatureCanvas.toDataURL('image/png');
-                    doc.addImage(signatureImage, 'PNG', 20, 160, 60, 30);
+                    doc.addImage(signatureImage, 'PNG', 20, 180, 60, 30);
                     
                     doc.setFont('helvetica', 'normal');
-                    doc.text('Signature captured electronically', 20, 200);
+                    doc.text('Signature captured electronically', 20, 220);
                 }
                 
                 // Timestamp
                 const timestamp = new Date().toLocaleString('en-US');
                 doc.setFont('helvetica', 'bold');
-                doc.text('Form Generated On:', 20, 220);
+                doc.text('Form Generated On:', 20, 240);
                 doc.setFont('helvetica', 'normal');
-                doc.text(timestamp, 20, 230);
+                doc.text(timestamp, 20, 250);
                 
                 // Footer
                 doc.setFontSize(10);
-                doc.text('This form was electronically generated and submitted to Google Forms.', 105, 250, { align: 'center' });
+                doc.text('This form was electronically generated and submitted to Google Forms.', 105, 270, { align: 'center' });
                 
                 // Generate filename
                 const filename = `Headphone_Acknowledgment_${name.replace(/\s+/g, '_')}_${date}.pdf`;
