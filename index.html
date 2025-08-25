@@ -301,7 +301,6 @@
                     <div class="signature-controls">
                         <button type="button" class="btn btn-secondary" id="clearSignature">Clear Signature</button>
                         <button type="button" class="btn btn-secondary" id="undoSignature">Undo</button>
-                        <button type="button" class="btn btn-secondary" id="testSignature">Test Draw</button>
                     </div>
                 </div>
                 
@@ -487,43 +486,7 @@
                 }
             });
             
-            // Test signature functionality
-            document.getElementById('testSignature').addEventListener('click', function() {
-                console.log('Test button clicked');
-                console.log('Canvas:', canvas);
-                console.log('Canvas context:', ctx);
-                console.log('Signature data:', signatureData);
-                
-                // Draw a test line
-                ctx.strokeStyle = '#ff0000';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(10, 10);
-                ctx.lineTo(100, 100);
-                ctx.stroke();
-                console.log('Test line drawn');
-                
-                // Reset to black
-                ctx.strokeStyle = '#000000';
-                ctx.lineWidth = 2;
-            });
-            
-            // Test Google Form submission
-            document.getElementById('testSignature').addEventListener('dblclick', function() {
-                console.log('Double-clicked test button - testing Google Form submission');
-                console.log('Form URL:', googleFormUrl);
-                console.log('Entry IDs:', {
-                    name: entryIdName,
-                    date: entryIdDate,
-                    signature: entryIdSignature,
-                    timestamp: entryIdTimestamp
-                });
-                
-                // Test the submission function
-                submitToGoogleForm().then(result => {
-                    console.log('Test submission result:', result);
-                });
-            });
+
             
             // Form validation
             document.getElementById('receiptDate').addEventListener('change', validateForm);
