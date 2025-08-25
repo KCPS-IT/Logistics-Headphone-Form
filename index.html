@@ -851,19 +851,10 @@
                 const filename = `Headphone_Acknowledgment_${name.replace(/\s+/g, '_')}_${date}.pdf`;
                 
                 // Download PDF (iOS compatible)
-                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    // For older browsers
-                    const blob = doc.output('blob');
-                    window.navigator.msSaveOrOpenBlob(blob, filename);
-                } else {
-                    // Modern browsers and iOS
-                    const pdfDataUri = doc.output('datauristring');
-                    
-                    // Create download link
-                    const link = document.createElement('a');
-                    link.href = pdfDataUri;
-                    link.download = filename;
-                    link.style.display = 'none';
+                try {
+                    // Convert to blob for better compatibility
+                    const pdfBlob = doc.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
                     
                     // For iOS, we need to open in new window
                     if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
@@ -879,6 +870,15 @@
                                             font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
                                             margin: 20px; 
                                             text-align: center; 
+                                            background: #f5f5f5;
+                                        }
+                                        .container {
+                                            max-width: 600px;
+                                            margin: 0 auto;
+                                            background: white;
+                                            padding: 20px;
+                                            border-radius: 15px;
+                                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                                         }
                                         .download-btn { 
                                             background: #007AFF; 
@@ -889,32 +889,98 @@
                                             display: inline-block; 
                                             margin: 20px; 
                                             font-size: 18px; 
+                                            font-weight: 600;
+                                        }
+                                        .download-btn:hover {
+                                            background: #0056CC;
                                         }
                                         .pdf-embed { 
                                             width: 100%; 
-                                            height: 80vh; 
-                                            border: none; 
+                                            height: 70vh; 
+                                            border: 1px solid #ddd;
+                                            border-radius: 8px;
                                             margin: 20px 0; 
+                                        }
+                                        .instructions {
+                                            background: #f8f9fa;
+                                            padding: 15px;
+                                            border-radius: 8px;
+                                            margin: 20px 0;
+                                            text-align: left;
+                                        }
+                                        .instructions ol {
+                                            margin: 10px 0;
+                                            padding-left: 20px;
+                                        }
+                                        .instructions li {
+                                            margin: 5px 0;
                                         }
                                     </style>
                                 </head>
                                 <body>
-                                    <h2>Headphone Acknowledgment Form</h2>
-                                    <p>Your form has been generated successfully!</p>
-                                    <a href="${pdfDataUri}" download="${filename}" class="download-btn">
-                                        📥 Download PDF
-                                    </a>
-                                    <p>Or view the PDF below:</p>
-                                    <embed src="${pdfDataUri}" type="application/pdf" class="pdf-embed">
+                                    <div class="container">
+                                        <h2>📄 Headphone Acknowledgment Form</h2>
+                                        <p>Your form has been generated successfully!</p>
+                                        
+                                        <div class="instructions">
+                                            <strong>To save this PDF to your device:</strong>
+                                            <ol>
+                                                <li>Tap the "Download PDF" button below</li>
+                                                <li>If nothing happens, long-press the button and select "Save Link As..."</li>
+                                                <li>Or tap the PDF preview below and use the share button</li>
+                                            </ol>
+                                        </div>
+                                        
+                                        <a href="${pdfUrl}" download="${filename}" class="download-btn">
+                                            📥 Download PDF
+                                        </a>
+                                        
+                                        <p><strong>PDF Preview:</strong></p>
+                                        <iframe src="${pdfUrl}" class="pdf-embed" title="PDF Preview"></iframe>
+                                        
+                                        <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                                            If the download doesn't work, you can also:
+                                            <br>1. Tap the PDF preview above
+                                            <br>2. Use the share button (📤) in your browser
+                                            <br>3. Select "Save to Files" or "Save to Photos"
+                                        </p>
+                                    </div>
                                 </body>
                             </html>
                         `);
+                        
+                        // Clean up the blob URL after a delay
+                        setTimeout(() => {
+                            URL.revokeObjectURL(pdfUrl);
+                        }, 30000); // 30 seconds
+                        
                     } else {
                         // Non-iOS devices - trigger download directly
+                        const link = document.createElement('a');
+                        link.href = pdfUrl;
+                        link.download = filename;
+                        link.style.display = 'none';
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
+                        
+                        // Clean up the blob URL
+                        setTimeout(() => {
+                            URL.revokeObjectURL(pdfUrl);
+                        }, 1000);
                     }
+                } catch (downloadError) {
+                    console.error('Download method failed, trying alternative:', downloadError);
+                    
+                    // Fallback: try direct download with data URI
+                    const pdfDataUri = doc.output('datauristring');
+                    const link = document.createElement('a');
+                    link.href = pdfDataUri;
+                    link.download = filename;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 }
                 
                 console.log('PDF generated and download initiated:', filename);
