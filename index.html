@@ -317,7 +317,7 @@
                     </p>
                     <div class="form-info">
                         <p><strong>Status:</strong> <span style="color: #28a745;">✓ Google Form Connected</span></p>
-                        <p><strong>Form URL:</strong> <a href="https://docs.google.com/forms/d/1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw/viewform" target="_blank" style="color: #667eea;">View Google Form</a></p>
+                        <p><strong>Form URL:</strong> <a href="https://docs.google.com/forms/d/1gQI_vFuMZe6gN_DUA-nOMzzVvE3dRG2m2mNELelxIRQ/viewform" target="_blank" style="color: #667eea;">View Google Form</a></p>
                     </div>
                 </div>
                 
@@ -345,13 +345,12 @@
         let lastY = 0;
         let isFormValid = false;
         let signatureData = [];
-        let googleFormUrl = 'https://docs.google.com/forms/d/1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw/formResponse';
-        let googleFormId = '1VMgbYJO_OHgm9iFryBRgz9Vgl7SGI2TAlbpkrII1hAw';
-        let entryIdName = 'entry.1859547506';
-        let entryIdSchool = 'entry.1171883598';
-        let entryIdDate = 'entry.687660393';
-        let entryIdSignature = 'entry.1682439405';
-        let entryIdTimestamp = 'entry.1625666380';
+        let googleFormUrl = 'https://docs.google.com/forms/d/1gQI_vFuMZe6gN_DUA-nOMzzVvE3dRG2m2mNELelxIRQ/formResponse';
+        let googleFormId = '1gQI_vFuMZe6gN_DUA-nOMzzVvE3dRG2m2mNELelxIRQ';
+        let entryIdDate = 'entry.1270368501';
+        let entryIdName = 'entry.858800146';
+        let entryIdSignature = 'entry.92940503';
+        let entryIdSchool = 'entry.1015066949';
 
         // Initialize signature pad
         document.addEventListener('DOMContentLoaded', function() {
@@ -652,25 +651,21 @@
                 const name = document.getElementById('userName').value.trim();
                 const school = document.getElementById('schoolName').value.trim();
                 const date = document.getElementById('receiptDate').value;
-                const now = new Date();
-                const timestamp = now.toLocaleDateString('en-US') + ' ' + now.toLocaleTimeString('en-US');
 
                 // Log what we're sending for debugging
                 console.log('Submitting form data:', {
                     name: name,
                     school: school,
                     date: date,
-                    signature: signatureText,
-                    timestamp: timestamp
+                    signature: signatureText
                 });
 
                 // Create URL-encoded form data (Google Forms expects this format)
                 const formData = new URLSearchParams();
-                formData.append(entryIdName, name);
-                formData.append(entryIdSchool, school);
                 formData.append(entryIdDate, date);
+                formData.append(entryIdName, name);
                 formData.append(entryIdSignature, signatureText);
-                formData.append(entryIdTimestamp, timestamp);
+                formData.append(entryIdSchool, school);
 
                 console.log('Form data string:', formData.toString());
 
@@ -713,11 +708,10 @@
 
                         // Add form fields
                         Object.entries({
-                            [entryIdName]: name,
-                            [entryIdSchool]: school,
                             [entryIdDate]: date,
+                            [entryIdName]: name,
                             [entryIdSignature]: signatureText,
-                            [entryIdTimestamp]: timestamp
+                            [entryIdSchool]: school
                         }).forEach(([key, value]) => {
                             const input = document.createElement('input');
                             input.type = 'hidden';
