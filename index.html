@@ -751,8 +751,9 @@
                 const date = document.getElementById('receiptDate').value;
                 const signatureCanvas = document.getElementById('signature-pad');
                 
-                // Format date for display
-                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                // Format date for display (fix timezone issue)
+                const dateObj = new Date(date + 'T00:00:00'); // Add time to prevent timezone conversion
+                const formattedDate = dateObj.toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
